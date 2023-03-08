@@ -163,7 +163,6 @@ def main():
     dataset_hh = get_vacancies_dataset_hh(languages)
     title_hh = 'HeadHunter Moscow'
     draw_table(dataset_hh, title_hh)
-    print()
     dataset_sj = get_vacancies_dataset_sj(languages, sj_api_key)
     title_sj = 'SuperJob Moscow'
     draw_table(dataset_sj, title_sj)
