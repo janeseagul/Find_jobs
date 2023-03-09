@@ -158,6 +158,8 @@ def main():
     title_hh = 'HeadHunter Moscow'
     draw_table(stats_hh, title_hh)
     stats_sj = get_vacancies_stats_sj(languages, sj_api_key)
+    draw_table(dataset_hh, title_hh)
+    dataset_sj = get_vacancies_dataset_sj(languages, sj_api_key)
     title_sj = 'SuperJob Moscow'
     draw_table(stats_sj, title_sj)
 
