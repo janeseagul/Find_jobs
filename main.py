@@ -16,35 +16,32 @@ def get_vacancies_stats_hh(languages):
     url = 'https://api.hh.ru/vacancies'
     vacancies_stats = {}
     for language in languages:
+        town_id = 1
+        search_period = 30
         page = 0
-        salaries_count = 0
         salaries_sum = 0
-        while True:
-            params = {
-                'text': f'программист {language}',
-                'area': 1,
-                'per_page': 100,
-                'page': page,
-            }
-            response = requests.get(url, params=params)
-            response.raise_for_status()
-            data = response.json()
-            if not data['items']:
-                break
-            for vacancy in data['items']:
-                salary = predict_rub_salary(vacancy.get('salary', {}).get('from'), vacancy.get('salary', {}).get('to'))
-                if salary:
-                    salaries_count += 1
-                    salaries_sum += salary
-            page += 1
-        if salaries_count:
-            vacancies_stats[language] = {
-                'vacancies_found': data['found'],
-                'vacancies_processed': params['page'] * 100,
-                'salaries_found': salaries_count,
-                'average_salary': int(salaries_sum / salaries_count) if salaries_count else 0
-            }
-
+        salaries_count = 0
+        params = {
+            'text': f'программист {language}',
+            'area': town_id,
+            'period': search_period,
+            'per_page': 100,
+            'only_with_salary': False
+        }
+        stats = requests.get(url, params=params).json()
+        for vacancy in stats['items']:
+            salary = predict_rub_salary_hh(vacancy)
+            if salary:
+                page += 1
+                salaries_sum += salary
+                salaries_count += 1
+            if salaries_count:
+                vacancies_stats[language] = {
+                    'vacancies_found': stats['found'],
+                    'vacancies_processed': page,
+                    'salaries_found': salaries_count,
+                    'average_salary': int(salaries_sum / salaries_count) if salaries_count else 0
+                }
     return vacancies_stats
 
 
@@ -79,32 +76,26 @@ def get_vacancies_stats_sj(languages, sj_api_key):
         page = 0
         salaries_count = 0
         salaries_sum = 0
-        while True:
-            params = {
-                'keyword': f'программист {language}',
-                'town': 'Москва',
-                'count': 100,
-                'page': page
-            }
-            response = requests.get(url, headers=headers, params=params)
-            response.raise_for_status()
-            data = response.json()
-            if not data['objects']:
-                break
-            for vacancy in data['objects']:
-                salary = predict_rub_salary(vacancy.get('payment', {}).get('from'),
-                                            vacancy.get('payment', {}).get('to'))
-                if salary:
-                    salaries_count += 1
-                    salaries_sum += salary
-            page += 1
-        if salaries_count:
-            vacancies_stats[language] = {
-                'vacancies_found': data['more'],
-                'vacancies_processed': params['page'] * 100,
-                'salaries_found': salaries_count,
-                'average_salary': int(salaries_sum / salaries_count) if salaries_count else 0
-            }
+        params = {
+            'keyword': f'программист {language}',
+            'town': 'Москва',
+            'count': 100,
+            'page': page
+        }
+        stats = requests.get(url, headers=headers, params=params).json()
+        for vacancy in stats['objects']:
+            salary = predict_rub_salary_sj(vacancy)
+            if salary:
+                page += 1
+                salaries_sum += salary
+                salaries_count += 1
+            if salaries_count:
+                vacancies_stats[language] = {
+                    'vacancies_found': stats['total'],
+                    'vacancies_processed': page,
+                    'salaries_found': salaries_count,
+                    'average_salary': int(salaries_sum / salaries_count) if salaries_count else 0
+                }
 
     return vacancies_stats
 
@@ -158,8 +149,6 @@ def main():
     title_hh = 'HeadHunter Moscow'
     draw_table(stats_hh, title_hh)
     stats_sj = get_vacancies_stats_sj(languages, sj_api_key)
-    draw_table(dataset_hh, title_hh)
-    dataset_sj = get_vacancies_dataset_sj(languages, sj_api_key)
     title_sj = 'SuperJob Moscow'
     draw_table(stats_sj, title_sj)
 
