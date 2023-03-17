@@ -35,7 +35,7 @@ def get_vacancies_stats_hh(languages):
                 page += 1
                 salaries_sum += salary
                 salaries_count += 1
-                average_income = int(salaries_sum / salaries_count)
+        average_income = int(salaries_sum / salaries_count)
         vacancies_stats[language] = {
             'vacancies_found': stats['found'],
             'vacancies_processed': page,
@@ -89,7 +89,7 @@ def get_vacancies_stats_sj(languages, sj_api_key):
                 page += 1
                 salaries_sum += salary
                 salaries_count += 1
-                average_income = int(salaries_sum / salaries_count)
+        average_income = int(salaries_sum / salaries_count)
         vacancies_stats[language] = {
             'vacancies_found': stats['total'],
             'vacancies_processed': page,
