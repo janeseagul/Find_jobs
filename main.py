@@ -35,12 +35,12 @@ def get_vacancies_stats_hh(languages):
                 page += 1
                 salaries_sum += salary
                 salaries_count += 1
-        average_income = int(salaries_sum / salaries_count)
+        average_income = int(salaries_sum / salaries_count) if salaries_count else 0
         vacancies_stats[language] = {
             'vacancies_found': stats['found'],
             'vacancies_processed': page,
             'salaries_found': salaries_count,
-            'average_salary': average_income if salaries_count else 0
+            'average_salary': average_income
         }
     return vacancies_stats
 
@@ -89,11 +89,11 @@ def get_vacancies_stats_sj(languages, sj_api_key):
                 page += 1
                 salaries_sum += salary
                 salaries_count += 1
-        average_income = int(salaries_sum / salaries_count)
+        average_income = int(salaries_sum / salaries_count) if salaries_count else 0
         vacancies_stats[language] = {
             'vacancies_found': stats['total'],
             'vacancies_processed': page,
-            'average_salary': average_income if salaries_count else 0,
+            'average_salary': average_income,
             'salaries_found': salaries_count
         }
 
@@ -144,7 +144,7 @@ def main():
         'Swift',
         'TypeScript'
     ]
-    sj_api_key = os.environ['SJ_API_KEY']
+    sj_api_key = 'v3.r.128692817.0e8d567df7c497f5b67eed3c63e9deba6e6d8f33.20e2dbe79f8a3ca3590270dd5924301c91d3279b'
     stats_hh = get_vacancies_stats_hh(languages)
     title_hh = 'HeadHunter Moscow'
     draw_table(stats_hh, title_hh)
