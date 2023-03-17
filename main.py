@@ -18,9 +18,8 @@ def get_vacancies_stats_hh(languages):
     for language in languages:
         town_id = 1
         search_period = 30
-        page = 0
+        all_vacancies = 0
         salaries_sum = 0
-        salaries_count = 0
         params = {
             'text': f'программист {language}',
             'area': town_id,
@@ -28,18 +27,18 @@ def get_vacancies_stats_hh(languages):
             'per_page': 100,
             'only_with_salary': False
         }
-        stats = requests.get(url, params=params).json()
-        stats.raise_for_status()
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        stats = response.json()
         for vacancy in stats['items']:
             salary = predict_rub_salary_hh(vacancy)
             if salary:
-                page += 1
+                all_vacancies += 1
                 salaries_sum += salary
-                salaries_count += 1
-        average_income = int(salaries_sum / salaries_count) if salaries_count else 0
+        average_income = int(salaries_sum / all_vacancies) if all_vacancies else 0
         vacancies_stats[language] = {
             'vacancies_found': stats['found'],
-            'vacancies_processed': page,
+            'vacancies_processed': all_vacancies,
             'average_salary': average_income
         }
     return vacancies_stats
@@ -73,27 +72,25 @@ def get_vacancies_stats_sj(languages, sj_api_key):
     }
     vacancies_stats = {}
     for language in languages:
-        page = 0
-        salaries_count = 0
+        all_vacancies = 0
         salaries_sum = 0
         params = {
             'keyword': f'программист {language}',
             'town': 'Москва',
             'count': 100,
-            'page': page
         }
-        stats = requests.get(url, headers=headers, params=params).json()
-        stats.raise_for_status()
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        stats = response.json()
         for vacancy in stats['objects']:
             salary = predict_rub_salary_sj(vacancy)
             if salary:
-                page += 1
+                all_vacancies += 1
                 salaries_sum += salary
-                salaries_count += 1
-        average_income = int(salaries_sum / salaries_count) if salaries_count else 0
+        average_income = int(salaries_sum / all_vacancies) if all_vacancies else 0
         vacancies_stats[language] = {
             'vacancies_found': stats['total'],
-            'vacancies_processed': page,
+            'vacancies_processed': all_vacancies,
             'average_salary': average_income,
         }
 
@@ -144,7 +141,7 @@ def main():
         'Swift',
         'TypeScript'
     ]
-    sj_api_key = os.environ['SJ_API_KEY']
+    sj_api_key = "v3.r.128692817.0e8d567df7c497f5b67eed3c63e9deba6e6d8f33.20e2dbe79f8a3ca3590270dd5924301c91d3279b"
     stats_hh = get_vacancies_stats_hh(languages)
     title_hh = 'HeadHunter Moscow'
     draw_table(stats_hh, title_hh)
