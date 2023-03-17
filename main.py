@@ -29,6 +29,7 @@ def get_vacancies_stats_hh(languages):
             'only_with_salary': False
         }
         stats = requests.get(url, params=params).json()
+        stats.raise_for_status()
         for vacancy in stats['items']:
             salary = predict_rub_salary_hh(vacancy)
             if salary:
@@ -39,7 +40,6 @@ def get_vacancies_stats_hh(languages):
         vacancies_stats[language] = {
             'vacancies_found': stats['found'],
             'vacancies_processed': page,
-            'salaries_found': salaries_count,
             'average_salary': average_income
         }
     return vacancies_stats
@@ -83,6 +83,7 @@ def get_vacancies_stats_sj(languages, sj_api_key):
             'page': page
         }
         stats = requests.get(url, headers=headers, params=params).json()
+        stats.raise_for_status()
         for vacancy in stats['objects']:
             salary = predict_rub_salary_sj(vacancy)
             if salary:
@@ -94,7 +95,6 @@ def get_vacancies_stats_sj(languages, sj_api_key):
             'vacancies_found': stats['total'],
             'vacancies_processed': page,
             'average_salary': average_income,
-            'salaries_found': salaries_count
         }
 
     return vacancies_stats
@@ -144,7 +144,7 @@ def main():
         'Swift',
         'TypeScript'
     ]
-    sj_api_key = 'v3.r.128692817.0e8d567df7c497f5b67eed3c63e9deba6e6d8f33.20e2dbe79f8a3ca3590270dd5924301c91d3279b'
+    sj_api_key = os.environ['SJ_API_KEY']
     stats_hh = get_vacancies_stats_hh(languages)
     title_hh = 'HeadHunter Moscow'
     draw_table(stats_hh, title_hh)
