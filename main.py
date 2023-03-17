@@ -36,13 +36,12 @@ def get_vacancies_stats_hh(languages):
                 salaries_sum += salary
                 salaries_count += 1
                 average_income = int(salaries_sum / salaries_count)
-            if salaries_count:
-                vacancies_stats[language] = {
-                    'vacancies_found': stats['found'],
-                    'vacancies_processed': page,
-                    'salaries_found': salaries_count,
-                    'average_salary': average_income
-                }
+        vacancies_stats[language] = {
+            'vacancies_found': stats['found'],
+            'vacancies_processed': page,
+            'salaries_found': salaries_count,
+            'average_salary': average_income if salaries_count else 0
+        }
     return vacancies_stats
 
 
@@ -68,7 +67,6 @@ def predict_rub_salary_hh(vacancy):
 
 
 def get_vacancies_stats_sj(languages, sj_api_key):
-    global average_income
     url = 'https://api.superjob.ru/2.0/vacancies/'
     headers = {
         'X-Api-App-Id': sj_api_key,
@@ -92,13 +90,12 @@ def get_vacancies_stats_sj(languages, sj_api_key):
                 salaries_sum += salary
                 salaries_count += 1
                 average_income = int(salaries_sum / salaries_count)
-                if salaries_count:
-                    vacancies_stats[language] = {
-                        'vacancies_found': stats['total'],
-                        'vacancies_processed': page,
-                        'average_salary': average_income,
-                        'salaries_found': salaries_count
-                    }
+        vacancies_stats[language] = {
+            'vacancies_found': stats['total'],
+            'vacancies_processed': page,
+            'average_salary': average_income if salaries_count else 0,
+            'salaries_found': salaries_count
+        }
 
     return vacancies_stats
 
