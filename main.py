@@ -141,7 +141,7 @@ def main():
         'Swift',
         'TypeScript'
     ]
-    sj_api_key = "v3.r.128692817.0e8d567df7c497f5b67eed3c63e9deba6e6d8f33.20e2dbe79f8a3ca3590270dd5924301c91d3279b"
+    sj_api_key = os.environ['SJ_API_KEY']
     stats_hh = get_vacancies_stats_hh(languages)
     title_hh = 'HeadHunter Moscow'
     draw_table(stats_hh, title_hh)
